@@ -106,7 +106,8 @@ public class InventoryControllerTest {
                         .content(this.inventory.getId()))
                         .andExpect(status().isOk())
                         .andReturn();
-        Assert.assertNull(result.getResponse().getContentType());
+
+        Assert.assertEquals("null",result.getResponse().getContentAsString());
     }
 }
 

@@ -73,14 +73,14 @@ public class InventoryDAOTest {
     Optional<Inventory> actualInventory = this.inventoryDAO.delete("TEST1");
     Assert.assertEquals(actualInventory, Optional.of(inventory));
     Optional<Inventory> actualInventory2 = this.inventoryDAO.delete("TEST1"); //this implicitly checks to make sure it can handle an invalid ID as well (handles the "if i == null")
-    Assert.assertEquals(null,actualInventory2);
+    Assert.assertTrue(actualInventory2.isEmpty());
   }
 
   // if id is null, check to make sure it returns null
   @Test
   public void delete2(){
     Optional<Inventory> actualInventory2 = this.inventoryDAO.delete(null);
-    Assert.assertEquals(null,actualInventory2);
+    Assert.assertTrue(actualInventory2.isEmpty());
   }
 
   // Per PR comments, reduced create tests to only one test, which now ensures that the object is added the correct amount of times
