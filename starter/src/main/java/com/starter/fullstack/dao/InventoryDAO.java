@@ -4,8 +4,11 @@ import com.starter.fullstack.api.Inventory;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.util.Assert;
@@ -52,7 +55,8 @@ public class InventoryDAO {
    */
   public Inventory create(Inventory inventory) {
     // TODO
-    return null;
+    inventory.setId(null);
+    return this.mongoTemplate.insert(inventory);
   }
 
   /**
@@ -82,7 +86,8 @@ public class InventoryDAO {
    * @return Deleted Inventory.
    */
   public Optional<Inventory> delete(String id) {
-    // TODO
-    return Optional.empty();
+    Query q = new Query();
+    q.addCriteria(Criteria.where("Id").is(id));
+    return Optional.ofNullable(this.mongoTemplate.findAndRemove(q, Inventory.class));
   }
 }

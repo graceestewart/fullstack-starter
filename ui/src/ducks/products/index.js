@@ -14,7 +14,7 @@ export let defaultState = {
   fetched: false,
 }
 
-export const findProducts = createAction(actions.PRODUCTS_GET_ALL, () =>
+export const findProducts = createAction(actions.PRODUCTS_GET_ALL, () => // we are defining what get_all does... i think
   (dispatch, getState, config) => axios
     .get(`${config.restAPIUrl}/products`)
     .then((suc) => dispatch(refreshProducts(suc.data)))
