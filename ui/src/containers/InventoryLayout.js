@@ -1,7 +1,16 @@
 import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
+import Avatar from '@material-ui/core/Avatar'
 import Checkbox from '@material-ui/core/Checkbox'
+import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
+import ImageIcon from '@material-ui/icons/Image'
+import InventoryFormModal from '../components/Inventory/InventoryFormModal'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemAvatar from '@material-ui/core/ListItemAvatar'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
 import { makeStyles } from '@material-ui/core/styles'
 import { MeasurementUnits } from '../constants/units'
 import moment from 'moment'
@@ -55,11 +64,30 @@ const InventoryLayout = (props) => {
     }
   }, [dispatch, isFetched])
 
+  const [isCreateOpen, setCreateOpen] = React.useState(false)
+  const [isEditOpen, setEditOpen] = React.useState(false)
   const normalizedInventory = normalizeInventory(inventory)
   const [order, setOrder] = React.useState('asc')
   const [orderBy, setOrderBy] = React.useState('calories')
   const [selected, setSelected] = React.useState([])
+  const toggleCreate = () => {
+    setCreateOpen(true)
+  }
+  const toggleEdit = () => {
+    setEditOpen(true)
+  }
 
+  const handleToggle = (value) => () => {
+    const currentIndex = checked.indexOf(value)
+    const newChecked = [...checked]
+
+    if (currentIndex === -1) {
+      newChecked.push(value)
+    } else {
+      newChecked.splice(currentIndex, 1)
+    }
+    setChecked(newChecked)
+  }
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
@@ -93,12 +121,27 @@ const InventoryLayout = (props) => {
     setSelected(newSelected)
   }
 
+  const [checked, setChecked] = React.useState([])
   const isSelected = (id) => selected.indexOf(id) !== -1
+  const toggleModals = (resetChecked) => {
+    setCreateOpen(false)
+    //setDeleteOpen(false)
+    setEditOpen(false)
+    if (resetChecked) {
+      setChecked([])
+    }
+  }
 
   return (
     <Grid container>
       <Grid item xs={12}>
-        <EnhancedTableToolbar numSelected={selected.length} title='Inventory'/>
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          title='Inventory'
+          toggleCreate={toggleCreate}
+          //toggleDelete={toggleDelete}
+          toggleEdit={toggleEdit}
+        />
         <TableContainer component={Paper}>
           <Table size='small' stickyHeader>
             <EnhancedTableHead
@@ -140,6 +183,22 @@ const InventoryLayout = (props) => {
             </TableBody>
           </Table>
         </TableContainer>
+        <InventoryFormModal
+          title='Create'
+          formName='inventoryCreate'
+          isDialogOpen={isCreateOpen}
+          handleDialog={toggleModals}
+          handleInventory={inventoryDuck.saveInventory}
+          initialValues={ { description: '', avgPrice: 0, amount: 0 } }
+        />
+        <InventoryFormModal
+          title='Edit'
+          formName='InventoryEdit'
+          isDialogOpen={isEditOpen}
+          handleDialog={toggleModals}
+          handleProduct={inventoryDuck.saveInventory}
+          initialValues={checked[0]}
+        />
       </Grid>
     </Grid>
   )

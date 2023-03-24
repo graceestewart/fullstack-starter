@@ -43,7 +43,7 @@ class ProductFormModal extends React.Component {
                 <Grid container>
                   <Grid item xs={12} sm={12}>
                     <Field
-                      custom={{ variant: 'outlined', fullWidth: true, }}
+                      custom={{ variant: 'outlined', fullWidth: true, }} // the box that pops up askng for name (top of pop up box says create product)
                       name='name'
                       label='Name'
                       component={TextField}
@@ -53,8 +53,8 @@ class ProductFormModal extends React.Component {
               </DialogContent>
               <DialogActions>
                 <Button onClick={() => { handleDialog(false) }} color='secondary'>Cancel</Button>
-                <Button
-                  disableElevation
+                <Button // the save button (the cancel is in line directly above this)
+                  //disableElevation
                   variant='contained'
                   type='submit'
                   form={formName}
