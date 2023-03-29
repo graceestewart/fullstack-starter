@@ -34,7 +34,8 @@ public class InventoryController {
   }
 
   @PostMapping
-  public Inventory create(Inventory inventory) {
+  public Inventory saveInventory(@RequestBody Inventory inventory) {
+    System.out.println(inventory);
     return this.inventoryDAO.create(inventory);
   }
 

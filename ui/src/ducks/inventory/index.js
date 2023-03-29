@@ -5,13 +5,14 @@ const actions = {
   INVENTORY_GET_ALL: 'inventory/get_all',
   INVENTORY_REFRESH: 'inventory/refresh',
   INVENTORY_DELETE: 'inventory/delete',
-  INVENTORY_SAVE: 'inventory/save', // unsure if this should be create instead of save
+  INVENTORY_CREATE: 'inventory/create', // unsure if this should be create instead of save
   INVENTORY_GET_ALL_PENDING: 'inventory/get_all_PENDING'
   // not sure if I want this like in product or if it should just be pending
 }
 
 export let defaultState = {
-  all: []
+  all: [],
+  fetched: false,
 }
 
 export const findInventory = createAction(actions.INVENTORY_GET_ALL, () =>
@@ -34,19 +35,22 @@ export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
     })
 )
 
-export const saveInventory = createAction(actions.INVENTORY_SAVE, (inventory) =>
+export const createInventory = createAction(actions.INVENTORY_CREATE, (inventory) =>
   (dispatch, getState, config) => axios
     .post(`${config.restAPIUrl}/inventory`, inventory)
     .then((suc) => {
       const invs = []
       getState().inventory.all.forEach(inv => {
-        // add everything except for the one (why is this not switched with the one in delete?)
         if (inv.id !== suc.data.id) {
           invs.push(inv)
         }
       })
-      invs.push(suc.data) // add the one last
+      invs.push(suc.data)
       dispatch(refreshInventory(invs))
+    })
+    .catch(function(error) {
+      console.log(error.response)
+      return Promise.reject(error)
     })
 )
 

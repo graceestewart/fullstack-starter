@@ -54,10 +54,10 @@ public class InventoryDAOTest {
     Assert.assertFalse(actualInventory.isEmpty());
   }
 
-  // check to see if it deletes the  object if given a valid ID, 
-  //and ensures that it returns null if deleting the same thing twice
-  // also check to see if it deletes the right object 
-  //if given a valid ID after 2 objects with same name/type were added
+  // check to see if it deletes the  object if given a valid ID, and ensures
+  // that it returns null if deleting the same thing twice
+  // also check to see if it deletes the right object if given a valid ID after
+  // 2 objects with same name/type were added
   @Test
   public void delete1() {
     Inventory inventory = new Inventory();
@@ -74,7 +74,7 @@ public class InventoryDAOTest {
 
     Optional<Inventory> actualInventory = this.inventoryDAO.delete("TEST1");
     Assert.assertEquals(actualInventory, Optional.of(inventory));
-    Optional<Inventory> actualInventory2 = this.inventoryDAO.delete("TEST1"); 
+    Optional<Inventory> actualInventory2 = this.inventoryDAO.delete("TEST1");
     //this implicitly checks to make sure it can handle an invalid ID as well (handles the "if i == null")
     Assert.assertTrue(actualInventory2.isEmpty());
   }
@@ -86,8 +86,8 @@ public class InventoryDAOTest {
     Assert.assertTrue(actualInventory2.isEmpty());
   }
 
-  // Per PR comments, reduced create tests to only one test, which now ensures that the
-  //  object is added the correct amount of times
+  // Per PR comments, reduced create tests to only one test, which
+  // now ensures that the object is added the correct amount of times
   // (one in this instance), and that the ID is set to null
   @Test
   public void create1() {
@@ -96,7 +96,8 @@ public class InventoryDAOTest {
     inventory.setProductType(PRODUCT_TYPE);
     inventory.setId("temp");
     this.inventoryDAO.create(inventory);
-    this.inventoryDAO.create(inventory); 
+    this.inventoryDAO.create(inventory);
+    // it should be able to add the same object more than once as well since the ID doesn't matter
     List<Inventory> actualInventory = this.mongoTemplate.findAll(Inventory.class);
     Assert.assertEquals(2, actualInventory.size());
     Assert.assertEquals(null, this.mongoTemplate.findById("temp", Inventory.class));

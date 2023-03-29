@@ -52,27 +52,28 @@ public class InventoryControllerTest {
 
 
   /**
-    * Test create endpoint.
-    * @throws Throwable see MockMvc
-    */
+   * Test create endpoint.
+   * @throws Throwable see MockMvc
+   */
   @Test
   public void create1() throws Throwable {
     this.inventory = new Inventory();
     this.inventory.setId("OTHER ID");
     this.inventory.setName("ALSO TEST");
     this.mockMvc.perform(post("/inventory")
-                  .accept(MediaType.APPLICATION_JSON)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(this.objectMapper.writeValueAsString(this.inventory)))
-          .andExpect(status().isOk());
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsString(this.inventory)))
+            .andExpect(status().isOk());
     this.mockMvc.perform(post("/inventory")
-                  .accept(MediaType.APPLICATION_JSON)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(this.objectMapper.writeValueAsString(this.inventory)))
-          .andExpect(status().isOk());
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsString(this.inventory)))
+            .andExpect(status().isOk());
 
     Assert.assertEquals(3, this.mongoTemplate.findAll(Inventory.class).size());
     Assert.assertEquals(null, this.mongoTemplate.findById("OTHER ID", Inventory.class));
+    // make sure sets ID to null
   }
 
   // check to ensure that the item gets deleted
@@ -83,25 +84,27 @@ public class InventoryControllerTest {
     i2.setName("OTHER_NAME");
     this.mongoTemplate.save(i2);
 
-    this.mockMvc.perform(delete("/inventory") 
+    this.mockMvc.perform(delete("/inventory")
+                    // remove inventory
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(this.inventory.getId()))
-                    .andExpect(status().isOk());
+            .andExpect(status().isOk());
     Assert.assertEquals(1, this.mongoTemplate.findAll(Inventory.class).size());
+    // make sure i2 is still in there
     Assert.assertEquals(i2, this.mongoTemplate.findById(this.i2.getId(), Inventory.class));
-    
-    Assert.assertNull(this.mongoTemplate.findById(this.inventory.getId(), Inventory.class));
 
-    // try to remove inventory again (testing invalid id)
+    Assert.assertNull(this.mongoTemplate.findById(this.inventory.getId(), Inventory.class));
+    // make sure inventory got taken out
+
     MvcResult result = this.mockMvc.perform(delete("/inventory")
+                    // try to remove inventory again (testing invalid id)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(this.inventory.getId()))
-                    .andExpect(status().isOk())
-                    .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
 
     Assert.assertEquals("null", result.getResponse().getContentAsString());
   }
 }
-
