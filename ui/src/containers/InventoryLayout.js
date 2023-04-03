@@ -16,7 +16,8 @@ import { EnhancedTableHead, EnhancedTableToolbar, getComparator, stableSort } fr
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-const date = new Date()
+const date = new Date().toJSON()
+const myDate = date.substring(5,7)+'/'+date.substring(8,10)+'/'+date.substring(0,5)
 
 
 const useStyles = makeStyles((theme) => ({
@@ -54,7 +55,7 @@ const InventoryLayout = (props) => {
   const products = useSelector(state => state.products.all)
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
   const saveInventory = useCallback(inventory => { dispatch(inventoryDuck.createInventory(inventory)) }, [dispatch])
-
+  const updateInventory = useCallback(inventory => { dispatch(inventoryDuck.updateInventory(inventory)) }, [dispatch])
   useEffect(() => {
     if (!isFetched) {
       dispatch(inventoryDuck.findInventory())
@@ -108,6 +109,7 @@ const InventoryLayout = (props) => {
   const toggleCreate = () => {
     setCreateOpen(true)
   }
+  const init = {}
   const toggleEdit = () => {
     setEditOpen(true)
   }
@@ -119,7 +121,7 @@ const InventoryLayout = (props) => {
     setDeleteOpen(false)
     setEditOpen(false)
     if (resetChecked) {
-      setChecked([])
+      setChecked([{ id: '', amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }])
     }
   }
   const [checked, setChecked] = React.useState([])
@@ -132,6 +134,8 @@ const InventoryLayout = (props) => {
     } else {
       newChecked.splice(currentIndex, 1)
     }
+    console.log('here')
+    console.log(newChecked[0].bestBeforeDate)
     setChecked(newChecked)
   }
 
@@ -165,7 +169,10 @@ const InventoryLayout = (props) => {
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => handleClick(event, inv.id)}
+                        onClick={(event) => {
+                          //handleToggle(inv)
+                          handleClick(event, inv.id)
+                        }}
                         role='checkbox'
                         aria-checked={isItemSelected}
                         tabIndex={-1}
@@ -173,7 +180,10 @@ const InventoryLayout = (props) => {
                         selected={isItemSelected}
                       >
                         <TableCell padding='checkbox'>
-                          <Checkbox checked={isItemSelected}/>
+                          <Checkbox
+                            onChange={handleToggle(inv)}
+                            checked={isItemSelected}
+                          />
                         </TableCell>
                         <TableCell padding='none'>{inv.name}</TableCell>
                         <TableCell align='right'>{inv.productType}</TableCell>
@@ -195,7 +205,17 @@ const InventoryLayout = (props) => {
           handleDialog={toggleModals}
           handleInventory={saveInventory}
           getProducts={products}
-          initialValues={{ amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: date, neverExpires: false }}
+          initialValues={{ id: '', amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }}
+        />
+        <InventoryFormModal
+          title='Edit'
+          formName='inventoryEdit'
+          isDialogOpen={isEditOpen}
+          handleDialog={toggleModals}
+          handleInventory={updateInventory}
+          getProducts={products}
+          //initialValues={{ amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }}
+          initialValues={checked[checked.length-1]}
         />
       </Grid>
     </Grid>

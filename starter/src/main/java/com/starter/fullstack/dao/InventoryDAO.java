@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.util.Assert;
 
 /**
@@ -56,6 +57,7 @@ public class InventoryDAO {
     // TODO
     inventory.setId(null);
     return this.mongoTemplate.insert(inventory);
+    //return null;
   }
 
   /**
@@ -76,7 +78,20 @@ public class InventoryDAO {
    */
   public Optional<Inventory> update(String id, Inventory inventory) {
     // TODO
-    return Optional.empty();
+    System.out.println("before making query");
+    Query q = new Query();
+    q.addCriteria(Criteria.where("id").is(id));
+
+    Update update = new Update();
+    update.set("name", inventory.getName());
+    update.set("productType", inventory.getProductType());
+    update.set("description", inventory.getDescription());
+    update.set("averagePrice", inventory.getAveragePrice());
+    update.set("amount", inventory.getAmount());
+    update.set("unitOfMeasurement", inventory.getUnitOfMeasurement());
+    update.set("bestBeforeDate", inventory.getBestBeforeDate());
+    this.mongoTemplate.findAndModify(q, update, Inventory.class);
+    return Optional.ofNullable(this.mongoTemplate.findById(id, Inventory.class));
   }
 
   /**

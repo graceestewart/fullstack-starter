@@ -35,8 +35,17 @@ public class InventoryController {
 
   @PostMapping
   public Inventory saveInventory(@RequestBody Inventory inventory) {
-    System.out.println(inventory);
     return this.inventoryDAO.create(inventory);
+  }
+
+  // @PostMapping
+  // public Inventory saveInventory(@RequestBody Inventory inventory) {
+  //   return this.inventoryDAO.create(inventory);
+  // }
+
+  @PutMapping
+  public Inventory updateInventory(@RequestBody Inventory inventory) {
+    return this.inventoryDAO.update(inventory.getId(), inventory).get();
   }
 
   @DeleteMapping

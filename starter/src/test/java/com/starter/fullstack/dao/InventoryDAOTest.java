@@ -103,4 +103,19 @@ public class InventoryDAOTest {
     Assert.assertEquals(null, this.mongoTemplate.findById("temp", Inventory.class));
   }
 
+  @Test
+  public void update() {
+    Inventory inventory = new Inventory();
+    inventory.setName(NAME);
+    inventory.setProductType(PRODUCT_TYPE);
+    inventory.setId("temp");
+    this.mongoTemplate.save(inventory);
+
+    inventory.setProductType("fruit");
+    this.inventoryDAO.update("temp", inventory);
+    // it should be able to add the same object more than once as well since the ID doesn't matter
+    String pt = inventory.getProductType();
+    Assert.assertEquals(pt, this.mongoTemplate.findById("temp", Inventory.class).getProductType());
+  }
+
 }
