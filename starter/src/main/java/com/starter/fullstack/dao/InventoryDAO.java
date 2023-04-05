@@ -103,8 +103,6 @@ public class InventoryDAO {
   public Optional<Inventory> delete(String id) {
     Query qu = new Query();
     qu.addCriteria(Criteria.where("id").is(id));
-    System.out.println();
-    System.out.println(id);
     return Optional.ofNullable(this.mongoTemplate.findAndRemove(qu, Inventory.class));
   }
 }

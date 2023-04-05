@@ -78,15 +78,19 @@ const InventoryLayout = (props) => {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = normalizedInventory.map((row) => row.id)
+      let newSelected = normalizedInventory.map((row) => row.id)
+      if (inventory.length == 1) {
+        const dt = inventory[0].bestBeforeDate
+        inventory[0].bestBeforeDate = dt.substring(5,7)+'/'+dt.substring(8,10)+'/'+dt.substring(0,4)
+      }
+      setChecked(inventory)
       setSelected(newSelected)
       return
     }
     setSelected([])
+    setChecked([{ id: '', amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }])
   }
-
   const handleClick = (event, id) => {
-    console.log('EVENT')
     const selectedIndex = selected.indexOf(id)
     let newSelected = []
     if (selectedIndex === -1) {
@@ -132,7 +136,6 @@ const InventoryLayout = (props) => {
   }
   const handleToggle = (value) => () => {
     const currentIndex = checked.findIndex((val) => val.id == value.id)
-    console.log(currentIndex)
     const newChecked = [...checked]
     if (newChecked.length > 0 && newChecked[0].name == ''){
       newChecked.splice(0, 1)
@@ -140,9 +143,10 @@ const InventoryLayout = (props) => {
     if (currentIndex == -1) {
       newChecked.push(value)
     } else {
-      newChecked.splice(currentIndex, 1)
+      if (selected.length != 0){
+        newChecked.splice(currentIndex, 1)
+      }
     }
-    console.log('here')
     setChecked(newChecked)
   }
 
@@ -176,16 +180,11 @@ const InventoryLayout = (props) => {
                     return (
                       <TableRow
                         hover
-                        //onClick={(event) => {
-                        //handleToggle(inv)
-                        //  handleClick(event, inv.id)
-                        //}}
                         role='checkbox'
                         aria-checked={isItemSelected}
                         tabIndex={-1}
                         key={inv.id}
                         selected={isItemSelected}
-                        //onChange={handleToggle(inv)}
                       >
                         <TableCell padding='checkbox'>
                           <Checkbox
@@ -225,7 +224,6 @@ const InventoryLayout = (props) => {
           handleDialog={toggleModals}
           handleInventory={updateInventory}
           getProducts={products}
-          //initialValues={{ amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }}
           initialValues={checked[checked.length-1]}
         />
         <InventoryDeleteModal
