@@ -73,7 +73,6 @@ public class InventoryControllerTest {
 
     Assert.assertEquals(3, this.mongoTemplate.findAll(Inventory.class).size());
     Assert.assertEquals(null, this.mongoTemplate.findById("OTHER ID", Inventory.class));
-    // make sure sets ID to null
   }
 
   // check to ensure that the item gets deleted
@@ -91,11 +90,8 @@ public class InventoryControllerTest {
                     .content("[\"" + this.inventory.getId() + "\"]"))
             .andExpect(status().isOk());
     Assert.assertEquals(1, this.mongoTemplate.findAll(Inventory.class).size());
-    // make sure i2 is still in there
     Assert.assertEquals(i2, this.mongoTemplate.findById(this.i2.getId(), Inventory.class));
-
     Assert.assertNull(this.mongoTemplate.findById(this.inventory.getId(), Inventory.class));
-    // make sure inventory got taken out
 
     MvcResult result = this.mockMvc.perform(delete("/inventory")
                     // try to remove inventory again (testing invalid id)

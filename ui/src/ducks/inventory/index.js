@@ -6,9 +6,8 @@ const actions = {
   INVENTORY_REFRESH: 'inventory/refresh',
   INVENTORY_UPDATE: 'inventory/update',
   INVENTORY_DELETE: 'inventory/delete',
-  INVENTORY_CREATE: 'inventory/create', // unsure if this should be create instead of save
+  INVENTORY_CREATE: 'inventory/create',
   INVENTORY_GET_ALL_PENDING: 'inventory/get_all_PENDING'
-  // not sure if I want this like in product or if it should just be pending
 }
 
 export let defaultState = {
@@ -26,8 +25,8 @@ export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
   (dispatch, getState, config) => axios
     .delete(`${config.restAPIUrl}/inventory`, { data : ids })
     .then((suc) => {
-      const invs = [] // i hope this isn't product specific (like products are in inventory)
-      getState().inventory.all.forEach(inv => { // no duplicates!
+      const invs = []
+      getState().inventory.all.forEach(inv => {
         if (!ids.includes(inv.id) && inv.id != suc.id) {
           invs.push(inv)
         }
@@ -74,12 +73,9 @@ export const updateInventory = createAction(actions.INVENTORY_UPDATE, (inventory
     })
 )
 
-
-// alphabetizing the inventory!
 export const refreshInventory = createAction(actions.INVENTORY_REFRESH, (payload) =>
   (dispatcher, getState, config) =>
     payload.sort((inventoryA, inventoryB) => inventoryA.name < inventoryB.name ? -1 : inventoryA.name > inventoryB.name ? 1 : 0)
-    // given A,B -> if Aname<Bname, return -1. if Aname>Bname, return 1. else 0.
 )
 
 export default handleActions({
