@@ -37,11 +37,6 @@ public class InventoryController {
     return this.inventoryDAO.create(inventory);
   }
 
-  // @PostMapping
-  // public Inventory saveInventory(@RequestBody Inventory inventory) {
-  //   return this.inventoryDAO.create(inventory);
-  // }
-
   @PutMapping
   public Inventory updateInventory(@RequestBody Inventory inventory) {
     return this.inventoryDAO.update(inventory.getId(), inventory).orElse(null);
@@ -49,9 +44,6 @@ public class InventoryController {
 
   @DeleteMapping
   public List<Inventory> delete(@RequestBody List<String> id) {
-    //for (int i = 0; i < id.length; i++) {
-    //this.inventoryDAO.delete(id);
-    //
     return this.inventoryDAO.delete(id);
   }
 }
