@@ -105,6 +105,6 @@ public class InventoryControllerTest {
             .andExpect(status().isOk())
             .andReturn();
 
-    Assert.assertEquals(0, result.getResponse().getContentAsString().length());
+    Assert.assertEquals("[]", result.getResponse().getContentAsString());
   }
 }

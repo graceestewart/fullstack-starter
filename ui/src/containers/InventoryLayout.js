@@ -17,8 +17,7 @@ import { EnhancedTableHead, EnhancedTableToolbar, getComparator, stableSort } fr
 import React, { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-const date = new Date().toJSON()
-const myDate = date.substring(5,7)+'/'+date.substring(8,10)+'/'+date.substring(0,5)
+const myDate = new Date().toLocaleDateString()
 
 
 const useStyles = makeStyles((theme) => ({
@@ -79,10 +78,7 @@ const InventoryLayout = (props) => {
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       let newSelected = normalizedInventory.map((row) => row.id)
-      if (inventory.length == 1) {
-        const dt = inventory[0].bestBeforeDate
-        inventory[0].bestBeforeDate = dt.substring(5,7)+'/'+dt.substring(8,10)+'/'+dt.substring(0,4)
-      }
+      console.log(inventory)
       setChecked(inventory)
       setSelected(newSelected)
       return
@@ -137,7 +133,7 @@ const InventoryLayout = (props) => {
   const handleToggle = (value) => () => {
     const currentIndex = checked.findIndex((val) => val.id == value.id)
     const newChecked = [...checked]
-    if (newChecked.length > 0 && newChecked[0].name == ''){
+    if (selected.length == 0){
       newChecked.splice(0, 1)
     }
     if (currentIndex == -1) {

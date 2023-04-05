@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
@@ -77,8 +78,6 @@ public class InventoryDAO {
    * @return Updated Inventory.
    */
   public Optional<Inventory> update(String id, Inventory inventory) {
-    // TODO
-    System.out.println("before making query");
     Query q = new Query();
     q.addCriteria(Criteria.where("id").is(id));
 
@@ -90,9 +89,9 @@ public class InventoryDAO {
     update.set("amount", inventory.getAmount());
     update.set("unitOfMeasurement", inventory.getUnitOfMeasurement());
     update.set("bestBeforeDate", inventory.getBestBeforeDate());
-    update.set("neverExpires", inventory.getNeverExpires());
-    this.mongoTemplate.findAndModify(q, update, Inventory.class);
-    return Optional.ofNullable(this.mongoTemplate.findById(id, Inventory.class));
+    update.set("neverExpires", inventory.isNeverExpires());
+    FindAndModifyOptions findAndModifyOptions = FindAndModifyOptions.options().returnNew(true);
+    return Optional.ofNullable(this.mongoTemplate.findAndModify(q, update, findAndModifyOptions, Inventory.class));
   }
 
   /**
@@ -100,9 +99,9 @@ public class InventoryDAO {
    * @param id Id of Inventory.
    * @return Deleted Inventory.
    */
-  public Optional<Inventory> delete(String id) {
+  public List<Inventory> delete(List<String> id) {
     Query qu = new Query();
-    qu.addCriteria(Criteria.where("id").is(id));
-    return Optional.ofNullable(this.mongoTemplate.findAndRemove(qu, Inventory.class));
+    qu.addCriteria(Criteria.where("id").in(id));
+    return this.mongoTemplate.findAllAndRemove(qu, Inventory.class);
   }
 }

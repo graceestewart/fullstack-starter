@@ -3,7 +3,6 @@ package com.starter.fullstack.rest;
 import com.starter.fullstack.api.Inventory;
 import com.starter.fullstack.dao.InventoryDAO;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,11 +48,11 @@ public class InventoryController {
   }
 
   @DeleteMapping
-  public Optional<Inventory> delete(@RequestBody String[] id) {
-    for (int i = 0; i < id.length; i++) {
-      this.inventoryDAO.delete(id[i]);
-    }
-    return null;
+  public List<Inventory> delete(@RequestBody List<String> id) {
+    //for (int i = 0; i < id.length; i++) {
+    //this.inventoryDAO.delete(id);
+    //
+    return this.inventoryDAO.delete(id);
   }
 }
 

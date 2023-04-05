@@ -1,8 +1,7 @@
 package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.annotation.Resource;
 import org.junit.After;
 import org.junit.Assert;
@@ -72,9 +71,11 @@ public class InventoryDAOTest {
     inventory2.setId("TEST2");
     this.mongoTemplate.save(inventory2);
 
-    this.inventoryDAO.delete("TEST1");
+    List<String> list = new ArrayList<String>();
+    list.add("TEST1");
+    this.inventoryDAO.delete(list);
     Assert.assertEquals(1, this.mongoTemplate.findAll(Inventory.class).size());
-    Optional<Inventory> actualInventory2 = this.inventoryDAO.delete("TEST1");
+    List<Inventory> actualInventory2 = this.inventoryDAO.delete(list);
     //this implicitly checks to make sure it can handle an invalid ID as well (handles the "if i == null")
     Assert.assertTrue(actualInventory2.isEmpty());
     Assert.assertEquals(inventory2, this.mongoTemplate.findById("TEST2", Inventory.class));
@@ -83,7 +84,8 @@ public class InventoryDAOTest {
   // if id is null, check to make sure it returns null
   @Test
   public void delete2() {
-    Optional<Inventory> actualInventory2 = this.inventoryDAO.delete(null);
+    List<String> list = new ArrayList<String>();
+    List<Inventory> actualInventory2 = this.inventoryDAO.delete(list);
     Assert.assertTrue(actualInventory2.isEmpty());
   }
 

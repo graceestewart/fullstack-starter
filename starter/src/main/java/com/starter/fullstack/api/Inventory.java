@@ -29,8 +29,4 @@ public class Inventory {
   private Instant bestBeforeDate;
   private boolean neverExpires;
   private List<String> availableStores;
-
-  public boolean getNeverExpires() {
-    return neverExpires;
-  }
 }
