@@ -27,7 +27,6 @@ class ProductFormModal extends React.Component {
         <Formik
           initialValues={initialValues}
           onSubmit={values => {
-            console.log(values)
             handleProduct(values)
             handleDialog(true)
           }}>
