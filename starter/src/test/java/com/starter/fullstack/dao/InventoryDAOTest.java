@@ -72,11 +72,12 @@ public class InventoryDAOTest {
     inventory2.setId("TEST2");
     this.mongoTemplate.save(inventory2);
 
-    Optional<Inventory> actualInventory = this.inventoryDAO.delete("TEST1");
-    Assert.assertEquals(actualInventory, Optional.of(inventory));
+    this.inventoryDAO.delete("TEST1");
+    Assert.assertEquals(1, this.mongoTemplate.findAll(Inventory.class).size());
     Optional<Inventory> actualInventory2 = this.inventoryDAO.delete("TEST1");
     //this implicitly checks to make sure it can handle an invalid ID as well (handles the "if i == null")
     Assert.assertTrue(actualInventory2.isEmpty());
+    Assert.assertEquals(inventory2, this.mongoTemplate.findById("TEST2", Inventory.class));
   }
 
   // if id is null, check to make sure it returns null

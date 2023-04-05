@@ -24,11 +24,11 @@ export const findInventory = createAction(actions.INVENTORY_GET_ALL, () =>
 
 export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
   (dispatch, getState, config) => axios
-    .delete(`${config.restAPIUrl}/inventory`, { data: ids })
+    .delete(`${config.restAPIUrl}/inventory`, { data : ids })
     .then((suc) => {
       const invs = [] // i hope this isn't product specific (like products are in inventory)
       getState().inventory.all.forEach(inv => { // no duplicates!
-        if (!ids.includes(inv.id)) {
+        if (!ids.includes(inv.id) && inv.id != suc.id) {
           invs.push(inv)
         }
       })

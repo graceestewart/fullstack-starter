@@ -2,6 +2,7 @@ import * as inventoryDuck from '../ducks/inventory'
 import * as productDuck from '../ducks/products'
 import Checkbox from '@material-ui/core/Checkbox'
 import Grid from '@material-ui/core/Grid'
+import InventoryDeleteModal from '../components/Inventory/InventoryDeleteModal'
 import InventoryFormModal from '../components/Inventory/InventoryFormModal'
 import { makeStyles } from '@material-ui/core/styles'
 import { MeasurementUnits } from '../constants/units'
@@ -56,6 +57,7 @@ const InventoryLayout = (props) => {
   const isFetched = useSelector(state => state.inventory.fetched && state.products.fetched)
   const saveInventory = useCallback(inventory => { dispatch(inventoryDuck.createInventory(inventory)) }, [dispatch])
   const updateInventory = useCallback(inventory => { dispatch(inventoryDuck.updateInventory(inventory)) }, [dispatch])
+  const removeInventory = useCallback(ids => { dispatch(inventoryDuck.removeInventory(ids)) }, [dispatch])
   useEffect(() => {
     if (!isFetched) {
       dispatch(inventoryDuck.findInventory())
@@ -84,6 +86,7 @@ const InventoryLayout = (props) => {
   }
 
   const handleClick = (event, id) => {
+    console.log('EVENT')
     const selectedIndex = selected.indexOf(id)
     let newSelected = []
     if (selectedIndex === -1) {
@@ -116,7 +119,10 @@ const InventoryLayout = (props) => {
   const toggleDelete = () => {
     setDeleteOpen(true)
   }
+  const [checked, setChecked] = React.useState([])
   const toggleModals = (resetChecked) => {
+    const del = isDeleteOpen
+    setSelected([])
     setCreateOpen(false)
     setDeleteOpen(false)
     setEditOpen(false)
@@ -124,18 +130,19 @@ const InventoryLayout = (props) => {
       setChecked([{ id: '', amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }])
     }
   }
-  const [checked, setChecked] = React.useState([])
   const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value)
+    const currentIndex = checked.findIndex((val) => val.id == value.id)
+    console.log(currentIndex)
     const newChecked = [...checked]
-
-    if (currentIndex === -1) {
+    if (newChecked.length > 0 && newChecked[0].name == ''){
+      newChecked.splice(0, 1)
+    }
+    if (currentIndex == -1) {
       newChecked.push(value)
     } else {
       newChecked.splice(currentIndex, 1)
     }
     console.log('here')
-    console.log(newChecked[0].bestBeforeDate)
     setChecked(newChecked)
   }
 
@@ -169,18 +176,22 @@ const InventoryLayout = (props) => {
                     return (
                       <TableRow
                         hover
-                        onClick={(event) => {
-                          //handleToggle(inv)
-                          handleClick(event, inv.id)
-                        }}
+                        //onClick={(event) => {
+                        //handleToggle(inv)
+                        //  handleClick(event, inv.id)
+                        //}}
                         role='checkbox'
                         aria-checked={isItemSelected}
                         tabIndex={-1}
                         key={inv.id}
                         selected={isItemSelected}
+                        //onChange={handleToggle(inv)}
                       >
                         <TableCell padding='checkbox'>
                           <Checkbox
+                            onClick={(event) => {
+                              handleClick(event, inv.id)
+                            }}
                             onChange={handleToggle(inv)}
                             checked={isItemSelected}
                           />
@@ -205,7 +216,7 @@ const InventoryLayout = (props) => {
           handleDialog={toggleModals}
           handleInventory={saveInventory}
           getProducts={products}
-          initialValues={{ id: '', amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }}
+          initialValues={{ id: '0', amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }}
         />
         <InventoryFormModal
           title='Edit'
@@ -216,6 +227,12 @@ const InventoryLayout = (props) => {
           getProducts={products}
           //initialValues={{ amount: 0, averagePrice: 0, name: '', description: '', productType: '', unitOfMeasurement: '', bestBeforeDate: myDate, neverExpires: false }}
           initialValues={checked[checked.length-1]}
+        />
+        <InventoryDeleteModal
+          isDialogOpen={isDeleteOpen}
+          handleDelete={removeInventory}
+          handleDialog={toggleModals}
+          initialValues={checked.map(check => check.id)}
         />
       </Grid>
     </Grid>

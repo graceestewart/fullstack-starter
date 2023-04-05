@@ -90,6 +90,7 @@ public class InventoryDAO {
     update.set("amount", inventory.getAmount());
     update.set("unitOfMeasurement", inventory.getUnitOfMeasurement());
     update.set("bestBeforeDate", inventory.getBestBeforeDate());
+    update.set("neverExpires", inventory.getNeverExpires());
     this.mongoTemplate.findAndModify(q, update, Inventory.class);
     return Optional.ofNullable(this.mongoTemplate.findById(id, Inventory.class));
   }
@@ -100,8 +101,10 @@ public class InventoryDAO {
    * @return Deleted Inventory.
    */
   public Optional<Inventory> delete(String id) {
-    Query q = new Query();
-    q.addCriteria(Criteria.where("Id").is(id));
-    return Optional.ofNullable(this.mongoTemplate.findAndRemove(q, Inventory.class));
+    Query qu = new Query();
+    qu.addCriteria(Criteria.where("id").is(id));
+    System.out.println();
+    System.out.println(id);
+    return Optional.ofNullable(this.mongoTemplate.findAndRemove(qu, Inventory.class));
   }
 }

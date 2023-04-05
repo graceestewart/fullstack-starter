@@ -45,12 +45,15 @@ public class InventoryController {
 
   @PutMapping
   public Inventory updateInventory(@RequestBody Inventory inventory) {
-    return this.inventoryDAO.update(inventory.getId(), inventory).get();
+    return this.inventoryDAO.update(inventory.getId(), inventory).orElse(null);
   }
 
   @DeleteMapping
-  public Optional<Inventory> delete(@RequestBody String id) {
-    return this.inventoryDAO.delete(id);
+  public Optional<Inventory> delete(@RequestBody String[] id) {
+    for (int i = 0; i < id.length; i++) {
+      this.inventoryDAO.delete(id[i]);
+    }
+    return null;
   }
 }
 

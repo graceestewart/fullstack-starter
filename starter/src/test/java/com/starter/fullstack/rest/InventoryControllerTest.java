@@ -88,7 +88,7 @@ public class InventoryControllerTest {
                     // remove inventory
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.inventory.getId()))
+                    .content("[\"" + this.inventory.getId() + "\"]"))
             .andExpect(status().isOk());
     Assert.assertEquals(1, this.mongoTemplate.findAll(Inventory.class).size());
     // make sure i2 is still in there
@@ -101,10 +101,10 @@ public class InventoryControllerTest {
                     // try to remove inventory again (testing invalid id)
                     .accept(MediaType.APPLICATION_JSON)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.inventory.getId()))
+                    .content("[\"" + this.inventory.getId() + "\"]"))
             .andExpect(status().isOk())
             .andReturn();
 
-    Assert.assertEquals("null", result.getResponse().getContentAsString());
+    Assert.assertEquals(0, result.getResponse().getContentAsString().length());
   }
 }
