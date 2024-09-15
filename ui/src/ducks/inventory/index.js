@@ -4,14 +4,15 @@ import { createAction, handleActions } from 'redux-actions'
 const actions = {
   INVENTORY_GET_ALL: 'inventory/get_all',
   INVENTORY_REFRESH: 'inventory/refresh',
+  INVENTORY_UPDATE: 'inventory/update',
   INVENTORY_DELETE: 'inventory/delete',
-  INVENTORY_SAVE: 'inventory/save', // unsure if this should be create instead of save
+  INVENTORY_CREATE: 'inventory/create',
   INVENTORY_GET_ALL_PENDING: 'inventory/get_all_PENDING'
-  // not sure if I want this like in product or if it should just be pending
 }
 
 export let defaultState = {
-  all: []
+  all: [],
+  fetched: false,
 }
 
 export const findInventory = createAction(actions.INVENTORY_GET_ALL, () =>
@@ -22,11 +23,11 @@ export const findInventory = createAction(actions.INVENTORY_GET_ALL, () =>
 
 export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
   (dispatch, getState, config) => axios
-    .delete(`${config.restAPIUrl}/inventory`, { data: ids })
+    .delete(`${config.restAPIUrl}/inventory`, { data : ids })
     .then((suc) => {
-      const invs = [] // i hope this isn't product specific (like products are in inventory)
-      getState().inventory.all.forEach(inv => { // no duplicates!
-        if (!ids.includes(inv.id)) {
+      const invs = []
+      getState().inventory.all.forEach(inv => {
+        if (!ids.includes(inv.id) && inv.id != suc.id) {
           invs.push(inv)
         }
       })
@@ -34,27 +35,47 @@ export const removeInventory = createAction(actions.INVENTORY_DELETE, (ids) =>
     })
 )
 
-export const saveInventory = createAction(actions.INVENTORY_SAVE, (inventory) =>
+export const createInventory = createAction(actions.INVENTORY_CREATE, (inventory) =>
   (dispatch, getState, config) => axios
     .post(`${config.restAPIUrl}/inventory`, inventory)
     .then((suc) => {
       const invs = []
       getState().inventory.all.forEach(inv => {
-        // add everything except for the one (why is this not switched with the one in delete?)
         if (inv.id !== suc.data.id) {
           invs.push(inv)
         }
       })
-      invs.push(suc.data) // add the one last
+      invs.push(suc.data)
       dispatch(refreshInventory(invs))
+    })
+    .catch(function(error) {
+      console.log(error.response)
+      return Promise.reject(error)
     })
 )
 
-// alphabetizing the inventory!
+export const updateInventory = createAction(actions.INVENTORY_UPDATE, (inventory) =>
+  (dispatch, getState, config) => axios
+    .put(`${config.restAPIUrl}/inventory`, inventory)
+    .then((suc) => {
+      const invs = []
+      getState().inventory.all.forEach(inv => {
+        if (inv.id !== suc.data.id) {
+          invs.push(inv)
+        }
+      })
+      invs.push(suc.data)
+      dispatch(refreshInventory(invs))
+    })
+    .catch(function(error) {
+      console.log(error.response)
+      return Promise.reject(error)
+    })
+)
+
 export const refreshInventory = createAction(actions.INVENTORY_REFRESH, (payload) =>
   (dispatcher, getState, config) =>
     payload.sort((inventoryA, inventoryB) => inventoryA.name < inventoryB.name ? -1 : inventoryA.name > inventoryB.name ? 1 : 0)
-    // given A,B -> if Aname<Bname, return -1. if Aname>Bname, return 1. else 0.
 )
 
 export default handleActions({

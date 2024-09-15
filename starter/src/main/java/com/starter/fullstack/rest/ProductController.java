@@ -57,4 +57,3 @@ public class ProductController {
     this.productDAO.deleteProductsByIdIn(ids);
   }
 }
-

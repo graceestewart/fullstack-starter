@@ -4,13 +4,14 @@ import com.starter.fullstack.api.Inventory;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
-
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.util.Assert;
 
 /**
@@ -54,7 +55,6 @@ public class InventoryDAO {
    * @return Created/Updated Inventory.
    */
   public Inventory create(Inventory inventory) {
-    // TODO
     inventory.setId(null);
     return this.mongoTemplate.insert(inventory);
   }
@@ -65,7 +65,6 @@ public class InventoryDAO {
    * @return Found Inventory.
    */
   public Optional<Inventory> retrieve(String id) {
-    // TODO
     return Optional.empty();
   }
 
@@ -76,8 +75,20 @@ public class InventoryDAO {
    * @return Updated Inventory.
    */
   public Optional<Inventory> update(String id, Inventory inventory) {
-    // TODO
-    return Optional.empty();
+    Query q = new Query();
+    q.addCriteria(Criteria.where("id").is(id));
+
+    Update update = new Update();
+    update.set("name", inventory.getName());
+    update.set("productType", inventory.getProductType());
+    update.set("description", inventory.getDescription());
+    update.set("averagePrice", inventory.getAveragePrice());
+    update.set("amount", inventory.getAmount());
+    update.set("unitOfMeasurement", inventory.getUnitOfMeasurement());
+    update.set("bestBeforeDate", inventory.getBestBeforeDate());
+    update.set("neverExpires", inventory.isNeverExpires());
+    FindAndModifyOptions findAndModifyOptions = FindAndModifyOptions.options().returnNew(true);
+    return Optional.ofNullable(this.mongoTemplate.findAndModify(q, update, findAndModifyOptions, Inventory.class));
   }
 
   /**
@@ -85,9 +96,9 @@ public class InventoryDAO {
    * @param id Id of Inventory.
    * @return Deleted Inventory.
    */
-  public Optional<Inventory> delete(String id) {
-    Query q = new Query();
-    q.addCriteria(Criteria.where("Id").is(id));
-    return Optional.ofNullable(this.mongoTemplate.findAndRemove(q, Inventory.class));
+  public List<Inventory> delete(List<String> id) {
+    Query qu = new Query();
+    qu.addCriteria(Criteria.where("id").in(id));
+    return this.mongoTemplate.findAllAndRemove(qu, Inventory.class);
   }
 }

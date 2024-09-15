@@ -5,7 +5,6 @@ import com.starter.fullstack.dao.InventoryDAO;
 import java.util.List;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
 
 /**
  * Inventory Controller.
@@ -34,12 +33,17 @@ public class InventoryController {
   }
 
   @PostMapping
-  public Inventory create(Inventory inventory){
+  public Inventory saveInventory(@RequestBody Inventory inventory) {
     return this.inventoryDAO.create(inventory);
   }
 
+  @PutMapping
+  public Inventory updateInventory(@RequestBody Inventory inventory) {
+    return this.inventoryDAO.update(inventory.getId(), inventory).orElse(null);
+  }
+
   @DeleteMapping
-  public Optional<Inventory> delete(@RequestBody String id){
+  public List<Inventory> delete(@RequestBody List<String> id) {
     return this.inventoryDAO.delete(id);
   }
 }

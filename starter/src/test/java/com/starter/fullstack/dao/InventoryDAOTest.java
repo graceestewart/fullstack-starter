@@ -1,8 +1,7 @@
 package com.starter.fullstack.dao;
 
 import com.starter.fullstack.api.Inventory;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.annotation.Resource;
 import org.junit.After;
 import org.junit.Assert;
@@ -54,8 +53,10 @@ public class InventoryDAOTest {
     Assert.assertFalse(actualInventory.isEmpty());
   }
 
-  // check to see if it deletes the  object if given a valid ID, and ensures that it returns null if deleting the same thing twice
-  // also check to see if it deletes the right object if given a valid ID after 2 objects with same name/type were added
+  // check to see if it deletes the  object if given a valid ID, and ensures
+  // that it returns null if deleting the same thing twice
+  // also check to see if it deletes the right object if given a valid ID after
+  // 2 objects with same name/type were added
   @Test
   public void delete1() {
     Inventory inventory = new Inventory();
@@ -70,20 +71,26 @@ public class InventoryDAOTest {
     inventory2.setId("TEST2");
     this.mongoTemplate.save(inventory2);
 
-    Optional<Inventory> actualInventory = this.inventoryDAO.delete("TEST1");
-    Assert.assertEquals(actualInventory, Optional.of(inventory));
-    Optional<Inventory> actualInventory2 = this.inventoryDAO.delete("TEST1"); //this implicitly checks to make sure it can handle an invalid ID as well (handles the "if i == null")
+    List<String> list = new ArrayList<String>();
+    list.add("TEST1");
+    this.inventoryDAO.delete(list);
+    Assert.assertEquals(1, this.mongoTemplate.findAll(Inventory.class).size());
+    List<Inventory> actualInventory2 = this.inventoryDAO.delete(list);
+    //this implicitly checks to make sure it can handle an invalid ID as well (handles the "if i == null")
     Assert.assertTrue(actualInventory2.isEmpty());
+    Assert.assertEquals(inventory2, this.mongoTemplate.findById("TEST2", Inventory.class));
   }
 
   // if id is null, check to make sure it returns null
   @Test
-  public void delete2(){
-    Optional<Inventory> actualInventory2 = this.inventoryDAO.delete(null);
+  public void delete2() {
+    List<String> list = new ArrayList<String>();
+    List<Inventory> actualInventory2 = this.inventoryDAO.delete(list);
     Assert.assertTrue(actualInventory2.isEmpty());
   }
 
-  // Per PR comments, reduced create tests to only one test, which now ensures that the object is added the correct amount of times
+  // Per PR comments, reduced create tests to only one test, which
+  // now ensures that the object is added the correct amount of times
   // (one in this instance), and that the ID is set to null
   @Test
   public void create1() {
@@ -92,10 +99,26 @@ public class InventoryDAOTest {
     inventory.setProductType(PRODUCT_TYPE);
     inventory.setId("temp");
     this.inventoryDAO.create(inventory);
-    this.inventoryDAO.create(inventory); // it should be able to add the same object more than once as well since the ID doesn't matter
+    this.inventoryDAO.create(inventory);
+    // it should be able to add the same object more than once as well since the ID doesn't matter
     List<Inventory> actualInventory = this.mongoTemplate.findAll(Inventory.class);
     Assert.assertEquals(2, actualInventory.size());
     Assert.assertEquals(null, this.mongoTemplate.findById("temp", Inventory.class));
+  }
+
+  @Test
+  public void update() {
+    Inventory inventory = new Inventory();
+    inventory.setName(NAME);
+    inventory.setProductType(PRODUCT_TYPE);
+    inventory.setId("temp");
+    this.mongoTemplate.save(inventory);
+
+    inventory.setProductType("fruit");
+    this.inventoryDAO.update("temp", inventory);
+    // it should be able to add the same object more than once as well since the ID doesn't matter
+    String pt = inventory.getProductType();
+    Assert.assertEquals(pt, this.mongoTemplate.findById("temp", Inventory.class).getProductType());
   }
 
 }

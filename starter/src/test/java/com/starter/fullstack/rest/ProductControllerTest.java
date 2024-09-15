@@ -95,4 +95,3 @@ public class ProductControllerTest {
     Assert.assertEquals(0, this.mongoTemplate.findAll(Product.class).size());
   }
 }
-
